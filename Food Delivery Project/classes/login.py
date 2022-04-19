@@ -15,19 +15,28 @@ class Login(object):
         self.login_frame(root)
 
     def main_frame_hide(self):
+        """
+        hides window
+        """
         self.root.withdraw()
 
     def main_frame_show(self):
+        """
+        shows window
+        """
         self.root.deiconify()
 
     def login_frame(self, root):
         """
         Creates the login window for database login
         """
+
+        # global variables for login_connect
         global user_entry
         global pwd_entry
         global frame
 
+        # hide main window and show TopLevel window first
         self.main_frame_hide()
         frame = Toplevel(root)
 
@@ -68,13 +77,10 @@ class Login(object):
         """
         Event that initiates when logging in the database
         """
-        self.user = user_entry.get()
-        self.pwd = pwd_entry.get()
-
         try:
             db = mysql.connector.connect(host='localhost',
-                                         user=self.user,
-                                         passwd=self.pwd,
+                                         user=user_entry.get(),
+                                         passwd=pwd_entry.get(),
                                          database='food_delivery')
             if db:
                 messagebox.showinfo("Login", "Login Successful!")
