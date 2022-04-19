@@ -1,12 +1,9 @@
-from classes.login import Login
+from classes.delivery import Delivery
 from tkinter import Tk
 
 
 def main():
-
-    root = Tk()
-    Login(root)
-    root.mainloop()
+    return Delivery()
 
 
 main()
