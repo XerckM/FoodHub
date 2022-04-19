@@ -1,10 +1,10 @@
 from classes.delivery import Delivery
-from tkinter import Tk
 
 
 def main():
     return Delivery()
 
 
-main()
+if __name__ == '__main__':
+    main()
 
