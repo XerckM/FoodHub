@@ -29,7 +29,7 @@ class Register(object):
 
     def reg_frame(self, root):
         # global variables
-        global fname_entry, lname_entry, uname_entry, email_entry, pword_entry, rframe
+        global fname_entry, lname_entry, uname_entry, email_entry, pword_entry, pword_verify_entry, rframe
 
         # hide main window and show TopLevel window first
         rframe = Toplevel(root)
@@ -95,21 +95,34 @@ class Register(object):
             uname = uname_entry.get()
             email = email_entry.get()
             pword = pword_entry.get()
-            if fname == '' or lname == '' or uname == '' or email == '' or pword == '':
-                messagebox.showinfo("", "Fields can not be empty!")
+            pword_verify = pword_verify_entry.get()
+            if '@' in fname or '@' in lname or '@' in uname:
+                messagebox.showinfo("Error!", "Invalid input on firstname, lastname, or username fields!")
+            elif fname == '' or lname == '' or uname == '' or email == '' or pword == '':
+                messagebox.showinfo("Error!", "Fields can not be empty!")
+            elif pword_verify != pword:
+                messagebox.showinfo("Error!", "Passwords do not match!")
             else:
                 db = mysql.connector.connect(host='localhost',
                                              user='root',
-                                             passwd='Jollyrancher09!',
+                                             passwd='password',
                                              database='food_delivery')
-
+                cursor = db.cursor()
                 query = f'INSERT INTO users (Fname, Lname, Uname, Email, Pword)\n' \
                         f'VALUES ("{fname_entry.get()}", "{lname_entry.get()}", "{uname_entry.get()}", ' \
                         f'"{email_entry.get()}", "{pword_entry.get()}") '
-                cursor = db.cursor()
+                self.create_user(cursor, uname, fname)
                 cursor.execute(query)
                 db.commit()
                 self.frame_hide(rframe)
                 messagebox.showinfo("", "Success!")
         except mysql.connector.errors.ProgrammingError:
-            messagebox.showinfo("", "Failed!")
+            messagebox.showinfo("", "Error registering user!")
+
+    @staticmethod
+    def create_user(cursor, uname, pword):
+        try:
+            sql_create = f'CREATE USER "%s"@"localhost" IDENTIFIED by "%s";' % (uname, pword)
+            cursor.execute(sql_create)
+        except Exception as err:
+            messagebox.showinfo("", "Error creating user!")
