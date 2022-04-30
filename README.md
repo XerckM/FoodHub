@@ -1,8 +1,6 @@
 # MySQL-Database-Python-Project
  Project for MySQL using Python
  
- Disclaimer: 
- 
  This project is not intended for commercial use but only for learning purposes.
  Any logos, icons, or names that have any similarity to actual commercial products have been accidental and were not intended.
  
