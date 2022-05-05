@@ -3,12 +3,12 @@ from tkinter import messagebox
 import mysql.connector
 
 
-class Admin(object):
+class User(object):
     def __init__(self, root):
         self.root = root
-        self.admin_frame(self.root)
+        self.user_frame(self.root)
 
-    def admin_frame(self, root):
+    def user_frame(self, root):
         # database connector
         sql_db = mysql.connector.connect(host='localhost',
                                          port='3307',
@@ -36,7 +36,7 @@ class Admin(object):
 
         # TODO: Add content below here
 
-        label = Label(frame, text="ADMIN CONTENT HERE")
+        label = Label(frame, text="USER CONTENT HERE")
         label.config(fg='black', bg='grey')
         label.place(relx=0.5, rely=0.5, anchor=CENTER)
 
