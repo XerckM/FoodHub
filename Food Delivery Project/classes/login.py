@@ -25,8 +25,8 @@ class Login(object):
         frame.iconbitmap('win_ico.ico')
 
         # set frame width and height
-        lframe_width = 360
-        lframe_height = 480
+        lframe_width = 320
+        lframe_height = 420
 
         # calculate x and y coordinates for window position in screen
         screen_pos_x = (frame.winfo_screenwidth() / 2) - (lframe_width / 2)
@@ -50,14 +50,18 @@ class Login(object):
         logo.place(relx=0.5, rely=0.2, anchor=CENTER)
 
         # username entry box
-        user_entry = Entry(rlbl_frame, textvariable=self.user, fg='grey', borderwidth=2)
+        user_entry = Entry(rlbl_frame, textvariable=self.user, fg='grey')
+        user_entry.config(relief='flat', highlightcolor='grey',
+                          highlightbackground='grey', highlightthickness=2)
         user_entry.insert(0, "Username")
         user_entry.place(relx=0.5, rely=0.45, anchor=CENTER)
         user_entry.bind('<FocusIn>', self.user_entry_onclick)
         user_entry.bind('<FocusOut>', self.user_entry_focusout)
 
         # password entry box
-        pwd_entry = Entry(rlbl_frame, textvariable=self.pwd, fg='grey', borderwidth=2)
+        pwd_entry = Entry(rlbl_frame, textvariable=self.pwd, fg='grey')
+        pwd_entry.config(relief='flat', highlightcolor='grey',
+                         highlightbackground='grey', highlightthickness=2)
         pwd_entry.insert(0, 'Password')
         pwd_entry.place(relx=0.5, rely=0.55, anchor=CENTER)
         pwd_entry.bind('<FocusIn>', self.pwd_entry_onclick)
@@ -65,17 +69,13 @@ class Login(object):
 
         # login button
         log_button = Button(rlbl_frame, command=self.login_connect)
-        log_button.config(text='Login', width=10, height=1, relief='flat', bg='green', fg='white')
-        log_button.place(relx=0.5, rely=0.7, anchor=CENTER)
+        log_button.config(text='Login', width=17, height=1, relief='flat', bg='green', fg='white')
+        log_button.place(relx=0.5, rely=0.65, anchor=CENTER)
 
         close = Label(frame, text='Cancel', cursor='hand2', bg='white')
         close.config(fg='blue')
         close.place(relx=0.5, rely=0.701, anchor=CENTER)
         close.bind('<Button-1>', lambda event: self.on_clickx(event))
-
-        # Copyright label
-        cr = Label(frame, text='Copyright © 2022 FoodHub Inc.', bg='#FF8000', fg='white')
-        cr.place(relx=0.5, rely=0.94, anchor=CENTER)
 
         frame.bind('<Return>', lambda event: self.login_connect(event))
         frame.protocol('WM_DELETE_WINDOW', self.on_clickx)
@@ -87,23 +87,27 @@ class Login(object):
         """
         try:
             sql_db = mysql.connector.connect(host='localhost',
+                                             port='3307',
                                              user='root',
-                                             passwd='password',
+                                             passwd='',
                                              database='food_delivery')
             uname = user_entry.get()
             pword = pwd_entry.get()
             sql_cursor = sql_db.cursor()
-            user_query = "SELECT * FROM users WHERE Uname = %s and Pword = %s"
+            user_query = "SELECT Uname, Pword FROM users WHERE Uname = %s AND Pword = %s"
             sql_cursor.execute(user_query, [uname, pword])
             result = sql_cursor.fetchall()
-            user_level = str([res[0] for res in result]).strip('[]')
             if result:
                 messagebox.showinfo("", "Login Successful!")
                 frame.destroy()
-                if user_level == '1':
-                    return Admin(self.root, uname, pword)
+                priviledge_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
+                sql_cursor.execute(priviledge_query, [uname, pword])
+                priviledge = sql_cursor.fetchone()
+                if priviledge[0] == "admin":
+                    print(True)
+                    # return Admin(self.root, uname, pword)
                 else:
-                    print("No")
+                    print(False)
             else:
                 messagebox.showinfo("Error!", "Incorrect username or password.")
         except mysql.connector.errors.ProgrammingError:
