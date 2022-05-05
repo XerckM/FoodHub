@@ -29,7 +29,7 @@ class Login(object):
 
         # set frame width and height
         frame_width = 320
-        frame_height = 420
+        frame_height = 460
 
         # calculate x and y coordinates for window position in screen
         screen_pos_x = (frame.winfo_screenwidth() / 2) - (frame_width / 2)
@@ -82,7 +82,7 @@ class Login(object):
 
         frame.bind('<Return>', lambda event: self.login_connect(event))
         frame.protocol('WM_DELETE_WINDOW', self.on_clickx)
-        frame.overrideredirect(True)
+        # frame.overrideredirect(True)
 
     def login_connect(self, event=None):
         """
@@ -104,12 +104,12 @@ class Login(object):
             if result:
                 messagebox.showinfo("", "Login Successful!")
                 frame.destroy()
-                privilege_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
-                sql_cursor.execute(priviledge_query, [uname, pword])
-                privilege = sql_cursor.fetchone()
-                if privilege[0] == "admin":
+                permission_query = "SELECT Perm FROM users WHERE Uname = %s AND Pword = %s"
+                sql_cursor.execute(permission_query, [uname, pword])
+                permission = sql_cursor.fetchone()
+                if permission[0] == "admin":
                     return Admin(self.root)
-                elif privilege[0] == "manage":
+                elif permission[0] == "manage":
                     return Restaurant(self.root)
                 else:
                     return User(self.root)
