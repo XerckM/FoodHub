@@ -104,12 +104,12 @@ class Login(object):
             if result:
                 messagebox.showinfo("", "Login Successful!")
                 frame.destroy()
-                priviledge_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
+                privilege_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
                 sql_cursor.execute(priviledge_query, [uname, pword])
-                priviledge = sql_cursor.fetchone()
-                if priviledge[0] == "admin":
+                privilege = sql_cursor.fetchone()
+                if privilege[0] == "admin":
                     return Admin(self.root)
-                elif priviledge[0] == "manage":
+                elif privilege[0] == "manage":
                     return Restaurant(self.root)
                 else:
                     return User(self.root)
