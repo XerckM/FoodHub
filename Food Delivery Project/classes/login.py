@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from classes.admin import Admin
+from classes.user import User
+from classes.restaurant import Restaurant
+
 import mysql.connector
 
 
@@ -105,8 +108,10 @@ class Login(object):
                 priviledge = sql_cursor.fetchone()
                 if priviledge[0] == "admin":
                     return Admin(self.root)
+                elif priviledge[0] == "manage":
+                    return Restaurant(self.root)
                 else:
-                    print(False)
+                    return User(self.root)
             else:
                 messagebox.showinfo("Error!", "Incorrect username or password.")
         except mysql.connector.errors.ProgrammingError:
