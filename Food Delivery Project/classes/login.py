@@ -114,7 +114,7 @@ class Login(object):
                     return User(self.root)
             else:
                 messagebox.showinfo("Error!", "Incorrect username or password.")
-        except mysql.connector.errors.ProgrammingError:
+        except mysql.connector.errors.InterfaceError:
             messagebox.showinfo("Error!", "Something wrong happened.")
             return False
 
