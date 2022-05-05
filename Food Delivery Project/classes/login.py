@@ -104,8 +104,7 @@ class Login(object):
                 sql_cursor.execute(priviledge_query, [uname, pword])
                 priviledge = sql_cursor.fetchone()
                 if priviledge[0] == "admin":
-                    print(True)
-                    # return Admin(self.root, uname, pword)
+                    return Admin(self.root)
                 else:
                     print(False)
             else:
