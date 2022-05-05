@@ -82,7 +82,7 @@ class Login(object):
 
         frame.bind('<Return>', lambda event: self.login_connect(event))
         frame.protocol('WM_DELETE_WINDOW', self.on_clickx)
-        # frame.overrideredirect(True)
+        frame.overrideredirect(True)
 
     def login_connect(self, event=None):
         """
