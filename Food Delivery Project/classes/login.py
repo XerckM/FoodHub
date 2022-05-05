@@ -89,6 +89,7 @@ class Login(object):
         Event that initiates when logging in the database
         """
         try:
+            # database connector
             sql_db = mysql.connector.connect(host='localhost',
                                              port='3307',
                                              user='root',
