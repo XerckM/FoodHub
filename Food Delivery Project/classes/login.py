@@ -25,18 +25,18 @@ class Login(object):
         frame.iconbitmap('win_ico.ico')
 
         # set frame width and height
-        lframe_width = 320
-        lframe_height = 420
+        frame_width = 320
+        frame_height = 420
 
         # calculate x and y coordinates for window position in screen
-        screen_pos_x = (frame.winfo_screenwidth() / 2) - (lframe_width / 2)
-        screen_pos_y = (frame.winfo_screenheight() / 2) - (lframe_height / 2)
+        screen_pos_x = (frame.winfo_screenwidth() / 2) - (frame_width / 2)
+        screen_pos_y = (frame.winfo_screenheight() / 2) - (frame_height / 2)
 
         # frame title, color, and size
         frame.title("Login")
         frame.resizable(False, False)
         frame.configure(bg='#FF8000')
-        frame.geometry('%dx%d+%d+%d' % (lframe_width, lframe_height, screen_pos_x, screen_pos_y))
+        frame.geometry('%dx%d+%d+%d' % (frame_width, frame_height, screen_pos_x, screen_pos_y))
 
         # inner frame
         rlbl_frame = LabelFrame(frame, width=240, height=360, bg='white', relief='flat')
@@ -139,6 +139,6 @@ class Login(object):
             user_entry.insert(0, 'Password')
             user_entry.config(fg='grey')
 
-    def on_clickx(self, even=None):
+    def on_clickx(self, event=None):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
             self.root.destroy()
