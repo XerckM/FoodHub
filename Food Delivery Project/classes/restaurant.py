@@ -6,6 +6,14 @@ import mysql.connector
 
 
 class Restaurant(object):
+    global sql_db
+    # database connector
+    sql_db = mysql.connector.connect(host='localhost',
+                                     port='3307',
+                                     user='root',
+                                     passwd='',
+                                     database='food_delivery')
+
     def __init__(self, root):
         self.root = root
         self.name = StringVar()
@@ -45,23 +53,28 @@ class Restaurant(object):
         # Output frames
         add_frame = Frame(frame)
         add_frame.config(width=850, height=565)
+        add_frame.grid_propagate(False)
         add_frame.grid(row=1, column=1, rowspan=5)
 
         remove_frame = Frame(frame)
         remove_frame.config(width=850, height=565)
+        remove_frame.grid_propagate(False)
         remove_frame.grid(row=1, column=1, rowspan=5)
 
         modify_frame = Frame(frame)
         modify_frame.config(width=850, height=565)
         modify_frame.grid(row=1, column=1, rowspan=5)
+        modify_frame.grid_propagate(False)
 
         profile_frame = Frame(frame)
         profile_frame.config(width=850, height=565)
         profile_frame.grid(row=1, column=1, rowspan=5)
+        profile_frame.grid_propagate(False)
 
-        edit_info_frame = Frame(frame)
-        edit_info_frame.config(width=850, height=565)
-        edit_info_frame.grid(row=1, column=1, rowspan=5)
+        view_menu_frame = Frame(frame)
+        view_menu_frame.config(width=850, height=565)
+        view_menu_frame.grid(row=1, column=1, rowspan=5)
+        view_menu_frame.grid_propagate(False)
 
         self.show_frame(add_frame)
 
@@ -69,43 +82,62 @@ class Restaurant(object):
 
         name_label = Label(add_frame)
         name_label.config(text="Name")
-        name_label.grid(row=0, column=0, padx=(0, 10), pady=(0, 20))
+        name_label.place(relx=0.35, rely=0.3, anchor=CENTER)
 
         price_label = Label(add_frame)
         price_label.config(text="Price")
-        price_label.grid(row=1, column=0, padx=(0, 10), pady=(0, 20))
+        price_label.place(relx=0.35, rely=0.4, anchor=CENTER)
 
         max_quantity_label = Label(add_frame)
         max_quantity_label.config(text="Max Quantity")
-        max_quantity_label.grid(row=2, column=0, padx=(0, 10), pady=(0, 20))
+        max_quantity_label.place(relx=0.35, rely=0.5, anchor=CENTER)
 
         menu_label = Label(add_frame)
         menu_label.config(text="Menu")
-        menu_label.grid(row=3, column=0, padx=(0, 10), pady=(0, 20))
+        menu_label.place(relx=0.35, rely=0.6, anchor=CENTER)
 
         name_entry = Entry(add_frame, textvariable=self.name)
         name_entry.config(width=30)
-        name_entry.grid(row=0, column=1, pady=(0, 20))
+        name_entry.place(relx=0.55, rely=0.3, anchor=CENTER)
 
         price_entry = Entry(add_frame, textvariable=self.price)
         price_entry.config(width=30)
-        price_entry.grid(row=1, column=1, pady=(0, 20))
+        price_entry.place(relx=0.55, rely=0.4, anchor=CENTER)
 
         max_quantity_entry = Entry(add_frame, textvariable=self.max_quantity)
         max_quantity_entry.config(width=30)
-        max_quantity_entry.grid(row=2, column=1, pady=(0, 20))
+        max_quantity_entry.place(relx=0.55, rely=0.5, anchor=CENTER)
 
         menu_list = ["Menu 1", "Menu 2", "Menu 3"]
         menu_option = ttk.Combobox(add_frame, textvariable=self.menu_var, state='readonly')
         menu_option.config(width=27, justify=CENTER)
         menu_option.set('---------Select Menu---------')
         menu_option['value'] = [item for item in menu_list]
-        menu_option.grid(row=3, column=1, pady=(0, 20))
+        menu_option.place(relx=0.55, rely=0.6, anchor=CENTER)
 
         add_frame_button = Button(add_frame, command=self.add)
         add_frame_button.config(text='Add Item', width=33)
-        add_frame_button.grid(row=4, columnspan=2)
+        add_frame_button.place(relx=0.5, rely=0.7, anchor=CENTER)
 
+        # remove frame activities
+
+        table_query = "SELECT * FROM food LIMIT 0, 10"
+        sql_cursor = sql_db.cursor()
+        table = sql_cursor.execute(table_query)
+
+        view_table = ttk.Treeview(remove_frame, selectmode='extended')
+        view_table.place(relx=0.5, rely=0.5, anchor=CENTER)
+        view_table['columns'] = ("1", "2", "3", "4", "5")
+        view_table['show'] = 'headings'
+        view_table.column("1", width=100, anchor='c')
+        view_table.column("2", width=100, anchor='c')
+        view_table.column("3", width=100, anchor='c')
+        view_table.column("4", width=100, anchor='c')
+        view_table.column("5", width=100, anchor='c')
+
+        remove_frame_button = Button(remove_frame)
+        remove_frame_button.config(text='Remove', width=33)
+        remove_frame_button.place(relx=0.355, rely=0.75)
 
         # Buttons
 
@@ -137,7 +169,7 @@ class Restaurant(object):
         profile_button.bind('<Leave>', lambda event: self.button_off_hover(profile_button, event))
         profile_button.grid(row=4, column=0)
 
-        view_menu_button = Button(frame, command=lambda: self.show_frame(edit_info_frame))
+        view_menu_button = Button(frame, command=lambda: self.show_frame(view_menu_frame))
         view_menu_button.config(text='View Current Menu', width=33, height=7, relief='flat', bg='#ff5900',
                                 activebackground='#c75610', fg='white')
         view_menu_button.bind('<Enter>', lambda event: self.button_on_hover(view_menu_button, event))
@@ -148,21 +180,18 @@ class Restaurant(object):
 
     def add(self, event=None):
         try:
-            # database connector
-            sql_db = mysql.connector.connect(host='localhost',
-                                             port='3307',
-                                             user='root',
-                                             passwd='',
-                                             database='food_delivery')
             name = self.name.get()
             quantity = self.max_quantity.get()
             price = self.price.get()
-            sql_cursor = sql_db.cursor()
-            add_query = "INSERT INTO `food`(`name`, `quantity`, `unitPrice`) " \
-                        "VALUES (%s, %s, %s)"
-            sql_cursor.execute(add_query, [name, quantity, price])
-            sql_db.commit()
-            messagebox.showinfo("", "Added!")
+            if name == "" and quantity == "" and price == "":
+                messagebox.showinfo("", "Values can not be empty")
+            else:
+                sql_cursor = sql_db.cursor()
+                add_query = "INSERT INTO `food`(`name`, `quantity`, `unitPrice`) " \
+                            "VALUES (%s, %s, %s)"
+                sql_cursor.execute(add_query, [name, quantity, price])
+                sql_db.commit()
+                messagebox.showinfo("", "Added!")
         except BaseException:
             messagebox.showinfo("", "Failed to add!")
 

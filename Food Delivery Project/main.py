@@ -7,8 +7,8 @@ def main():
     root = Tk()
     root.iconbitmap('win_ico.ico')
     root.withdraw()
-    Login(root)
-    # Restaurant(root)
+    # Login(root)
+    Restaurant(root)
     root.mainloop()
 
 
