@@ -15,13 +15,6 @@ class Restaurant(object):
         self.restaurant_frame(self.root)
 
     def restaurant_frame(self, root):
-        # database connector
-        sql_db = mysql.connector.connect(host='localhost',
-                                         port='3307',
-                                         user='root',
-                                         passwd='',
-                                         database='food_delivery')
-
         # top level frame and window icon
         frame = Toplevel(root)
         frame.iconbitmap('win_ico.ico')
@@ -109,44 +102,69 @@ class Restaurant(object):
         menu_option['value'] = [item for item in menu_list]
         menu_option.grid(row=3, column=1, pady=(0, 20))
 
+        add_frame_button = Button(add_frame, command=self.add)
+        add_frame_button.config(text='Add Item', width=33)
+        add_frame_button.grid(row=4, columnspan=2)
+
+
         # Buttons
 
         add_button = Button(frame, command=lambda: self.show_frame(add_frame))
-        add_button.config(text='Add Food', width=33, height=6, relief='flat', bg='#FF8000',
-                          activebackground='#c75610', highlightthickness=1, highlightbackground='black')
+        add_button.config(text='Add Food', width=33, height=6, relief='flat', bg='#ff5900',
+                          activebackground='#c75610', fg='white')
         add_button.bind('<Enter>', lambda event: self.button_on_hover(add_button, event))
         add_button.bind('<Leave>', lambda event: self.button_off_hover(add_button, event))
         add_button.grid(row=1, column=0)
 
         remove_button = Button(frame, command=lambda: self.show_frame(remove_frame))
         remove_button.config(text='Remove Food', width=33, height=7, relief='flat', bg='#FF8000',
-                             activebackground='#c75610')
+                             activebackground='#c75610', fg='white')
         remove_button.bind('<Enter>', lambda event: self.button_on_hover(remove_button, event))
         remove_button.bind('<Leave>', lambda event: self.button_off_hover(remove_button, event))
         remove_button.grid(row=2, column=0)
 
         modify_button = Button(frame, command=lambda: self.show_frame(modify_frame))
-        modify_button.config(text='Modify Food', width=33, height=7, relief='flat', bg='#FF8000',
-                             activebackground='#c75610')
+        modify_button.config(text='Modify Food', width=33, height=7, relief='flat', bg='#ff5900',
+                             activebackground='#c75610', fg='white')
         modify_button.bind('<Enter>', lambda event: self.button_on_hover(modify_button, event))
         modify_button.bind('<Leave>', lambda event: self.button_off_hover(modify_button, event))
         modify_button.grid(row=3, column=0)
 
         profile_button = Button(frame, command=lambda: self.show_frame(profile_frame))
         profile_button.config(text='Edit Profile', width=33, height=7, relief='flat', bg='#FF8000',
-                              activebackground='#c75610')
+                              activebackground='#c75610', fg='white')
         profile_button.bind('<Enter>', lambda event: self.button_on_hover(profile_button, event))
         profile_button.bind('<Leave>', lambda event: self.button_off_hover(profile_button, event))
         profile_button.grid(row=4, column=0)
 
-        edit_info_button = Button(frame, command=lambda: self.show_frame(edit_info_frame))
-        edit_info_button.config(text='Edit Contact Info', width=33, height=7, relief='flat', bg='#FF8000',
-                                activebackground='#c75610')
-        edit_info_button.bind('<Enter>', lambda event: self.button_on_hover(edit_info_button, event))
-        edit_info_button.bind('<Leave>', lambda event: self.button_off_hover(edit_info_button, event))
-        edit_info_button.grid(row=5, column=0)
+        view_menu_button = Button(frame, command=lambda: self.show_frame(edit_info_frame))
+        view_menu_button.config(text='View Current Menu', width=33, height=7, relief='flat', bg='#ff5900',
+                                activebackground='#c75610', fg='white')
+        view_menu_button.bind('<Enter>', lambda event: self.button_on_hover(view_menu_button, event))
+        view_menu_button.bind('<Leave>', lambda event: self.button_off_hover(view_menu_button, event))
+        view_menu_button.grid(row=5, column=0)
 
         frame.protocol('WM_DELETE_WINDOW', self.on_clickx)
+
+    def add(self, event=None):
+        try:
+            # database connector
+            sql_db = mysql.connector.connect(host='localhost',
+                                             port='3307',
+                                             user='root',
+                                             passwd='',
+                                             database='food_delivery')
+            name = self.name.get()
+            quantity = self.max_quantity.get()
+            price = self.price.get()
+            sql_cursor = sql_db.cursor()
+            add_query = "INSERT INTO `food`(`name`, `quantity`, `unitPrice`) " \
+                        "VALUES (%s, %s, %s)"
+            sql_cursor.execute(add_query, [name, quantity, price])
+            sql_db.commit()
+            messagebox.showinfo("", "Added!")
+        except BaseException:
+            messagebox.showinfo("", "Failed to add!")
 
     def on_clickx(self, event=None):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
@@ -162,4 +180,7 @@ class Restaurant(object):
 
     @staticmethod
     def button_off_hover(button, event=None):
-        button['background'] = '#FF8000'
+        if button['text'] in ('Add Food', 'Modify Food', 'View Current Menu'):
+            button['background'] = '#ff5900'
+        else:
+            button['background'] = '#FF8000'

@@ -104,7 +104,7 @@ class Login(object):
             if result:
                 messagebox.showinfo("", "Login Successful!")
                 frame.destroy()
-                permission_query = "SELECT Perm FROM users WHERE Uname = %s AND Pword = %s"
+                permission_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
                 sql_cursor.execute(permission_query, [uname, pword])
                 permission = sql_cursor.fetchone()
                 if permission[0] == "admin":
