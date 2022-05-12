@@ -33,7 +33,8 @@ class Restaurant(object):
             tree_rmv_frame, modify_table_menu, mod_view_table, tree_mod_frame, \
             mod_name_entry, mod_price_entry, mod_calories_entry, mod_frame_button, \
             res_name_box, res_city_box, res_phone_box, res_open_box, res_close_box, \
-            res_owner_box, res_city_box, res_state_box, profile_frame, apply_profile_button
+            res_owner_box, res_city_box, res_state_box, profile_frame, apply_profile_button, \
+            view_orders_table, tree_view_frame
 
         # top level frame and window icon
         frame = Toplevel(root)
@@ -322,19 +323,33 @@ class Restaurant(object):
 
         # view orders frame
 
-        view_orders_table = ttk.Treeview(view_orders_frame, selectmode='extended')
-        view_orders_table.place(relx=0.5, rely=0.5, anchor=CENTER)
-        view_orders_table['columns'] = ("1", "2", "3", "4", "5")
-        view_orders_table['show'] = 'headings'
+        tree_view_frame = Frame(view_orders_frame)
+        tree_view_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        tree_view_scroll = Scrollbar(tree_view_frame)
+        tree_view_scroll.pack(side=RIGHT, fill=Y)
+
+        view_orders_table = ttk.Treeview(tree_view_frame, selectmode='extended')
+        view_orders_table.config(columns=("1", "2", "3", "4"), show='headings',
+                                 yscrollcommand=tree_view_scroll.set)
+        tree_view_scroll.config(command=view_orders_table.yview)
+        view_orders_table.pack()
         view_orders_table.column("1", width=100, anchor='c')
         view_orders_table.column("2", width=100, anchor='c')
         view_orders_table.column("3", width=100, anchor='c')
         view_orders_table.column("4", width=100, anchor='c')
-        view_orders_table.column("5", width=100, anchor='c')
+        view_orders_table.heading("1", text="Inorder Id")
+        view_orders_table.heading("2", text="Menu Id")
+        view_orders_table.heading("3", text="Food Name")
+        view_orders_table.heading("4", text="Order Id")
 
-        view_orders_button = Button(view_orders_frame)
+        view_orders_button = Button(view_orders_frame, command=self.order_ready_button)
         view_orders_button.config(text='Order Ready for Pickup', width=33)
         view_orders_button.place(relx=0.355, rely=0.75)
+
+        refresh_orders_button = Button(view_orders_frame, command=self.refresh_button)
+        refresh_orders_button.config(text='Refresh', width=33)
+        refresh_orders_button.place(relx=0.355, rely=0.8)
 
         # Left Side Buttons
 
@@ -413,6 +428,27 @@ class Restaurant(object):
             messagebox.showinfo("", "Added!")
         else:
             messagebox.showinfo("", "Values can not be empty. Select either from dropdown or create new menu")
+
+    @staticmethod
+    def order_ready_button(event=None):
+        get_selection = view_orders_table.selection()
+        size_of_selection = len(get_selection)
+        for item in range(size_of_selection):
+            pass
+
+    @staticmethod
+    def refresh_button(event=None):
+        view_orders_table.delete(*view_orders_table.get_children())
+        tree_view_frame.update()
+
+        view_order_query = "SELECT inOrder_id, inorder.menuId, foodName, inorder.orderId FROM inorder, orders " \
+                           "INNER JOIN food WHERE inorder.foodId = food.foodId " \
+                           "AND orders.orderId = inorder.orderId"
+        sql_cursor.execute(view_order_query)
+        table_items = sql_cursor.fetchall()
+
+        for dt in table_items:
+            view_orders_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2], dt[3]))
 
     def on_clickx(self, event=None):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):

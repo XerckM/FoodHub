@@ -23,7 +23,8 @@ class Customer(object):
 
     def customer_frame(self, root):
         global view_table, tree_order_frame, restaurant_menu, view_table, \
-            tree_view_order_frame, view_order_table
+            tree_view_order_frame, view_order_table, pay_frame, total_entry, pay_name_entry, \
+            credit_card_entry, exp_date_entry, sec_code_entry, order_frame
 
         # top level frame and window icon
         frame = Toplevel(root)
@@ -57,21 +58,23 @@ class Customer(object):
         order_frame.config(width=850, height=565)
         order_frame.grid_propagate(False)
         order_frame.grid(row=1, column=1, rowspan=5)
+        order_frame.grid_propagate(False)
 
         view_order_status_frame = Frame(frame)
         view_order_status_frame.config(width=850, height=565)
         view_order_status_frame.grid_propagate(False)
         view_order_status_frame.grid(row=1, column=1, rowspan=5)
+        view_order_status_frame.grid_propagate(False)
 
         profile_frame = Frame(frame)
         profile_frame.config(width=850, height=565)
         profile_frame.grid(row=1, column=1, rowspan=5)
         profile_frame.grid_propagate(False)
 
-        profile_frame = Frame(frame)
-        profile_frame.config(width=850, height=565)
-        profile_frame.grid(row=1, column=1, rowspan=5)
-        profile_frame.grid_propagate(False)
+        pay_frame = Frame(frame)
+        pay_frame.config(width=850, height=565)
+        pay_frame.grid(row=1, column=1, rowspan=5)
+        pay_frame.grid_propagate(False)
 
         view_orders_frame = Frame(frame)
         view_orders_frame.config(width=850, height=565)
@@ -143,9 +146,56 @@ class Customer(object):
         delete_frame_button.config(text='Delete', width=33)
         delete_frame_button.place(relx=0.6, rely=0.75)
 
-        pay_frame_button = Button(order_frame, command='')
+        pay_frame_button = Button(order_frame, command=self.pay_button)
         pay_frame_button.config(text='Pay', width=33)
         pay_frame_button.place(relx=0.6, rely=0.8)
+
+        # pay frame activities
+
+        total_label = Label(pay_frame)
+        total_label.config(text="Total")
+        total_label.place(relx=0.35, rely=0.3, anchor='w')
+
+        pay_name_label = Label(pay_frame)
+        pay_name_label.config(text="Name")
+        pay_name_label.place(relx=0.35, rely=0.4, anchor='w')
+
+        credit_card_label = Label(pay_frame)
+        credit_card_label.config(text="Credit Card Number")
+        credit_card_label.place(relx=0.35, rely=0.45, anchor='w')
+
+        exp_date_label = Label(pay_frame)
+        exp_date_label.config(text="Expiration Date")
+        exp_date_label.place(relx=0.35, rely=0.5, anchor='w')
+
+        security_code_label = Label(pay_frame)
+        security_code_label.config(text="Enter Security Code")
+        security_code_label.place(relx=0.35, rely=0.55, anchor='w')
+
+        total_entry = Entry(pay_frame)
+        total_entry.config(width=30, bg='#F0F0F0')
+        total_entry.place(relx=0.6, rely=0.3, anchor=CENTER)
+
+        pay_name_entry = Entry(pay_frame)
+        pay_name_entry.config(width=30)
+        pay_name_entry.place(relx=0.6, rely=0.4, anchor=CENTER)
+
+        credit_card_entry = Entry(pay_frame)
+        credit_card_entry.config(width=30)
+        credit_card_entry.place(relx=0.6, rely=0.45, anchor=CENTER)
+
+        exp_date_entry = Entry(pay_frame)
+        exp_date_entry.config(width=30)
+        exp_date_entry.place(relx=0.6, rely=0.5, anchor=CENTER)
+
+        sec_code_entry = Entry(pay_frame)
+        sec_code_entry.config(width=30)
+        sec_code_entry.place(relx=0.6, rely=0.55, anchor=CENTER)
+
+        confirm_pay_button = Button(pay_frame, command='')
+        confirm_pay_button.config(text="Confirm and Pay", width=33)
+        confirm_pay_button.place(relx=0.4, rely=0.6)
+
 
         # Buttons
 
@@ -229,7 +279,6 @@ class Customer(object):
         for dt in table_items:
             view_order_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2], dt[3]))
 
-
     @staticmethod
     def view_res_food_table(event=None):
         view_table.delete(*view_table.get_children())
@@ -244,6 +293,32 @@ class Customer(object):
 
         for dt in table_items:
             view_table.insert(parent='', index='end', iid=dt[0], values=(dt[0], dt[1], dt[2], dt[3], dt[4]))
+
+    @staticmethod
+    def pay_button(event=None):
+        total_query = "SELECT SUM(price) Total FROM food as f INNER JOIN inorder as io WHERE f.foodId = io.foodId"
+        sql_cursor.execute(total_query)
+        total = sql_cursor.fetchall()
+        total_entry.insert(0, total[0])
+        pay_frame.tkraise()
+
+    def confirm_pay_button(self, event=None):
+        if pay_name_entry.get() != "" and credit_card_entry.get() != "" and exp_date_entry.get() == "" and \
+                sec_code_entry.get() != "":
+            customer_id = self.id
+            payment_query = "INSERT INTO payment (paymentType, payAccepted, orderId)" \
+                            "VALUES ('Visa', 'Yes', (SELECT order.orderId FROM order WHERE customerId = %s))"
+            sql_cursor.execute(payment_query, [customer_id])
+            sql_db.commit()
+            total_entry.delete(0, END)
+            pay_name_entry.delete(0, END)
+            credit_card_entry.delete(0, END)
+            exp_date_entry.delete(0, END)
+            sec_code_entry.delete(0, END)
+            messagebox.showinfo("", "Payment Successful!")
+            order_frame.tkraise()
+        else:
+            messagebox.showinfo("", "Payment Failed!")
 
     @staticmethod
     def show_frame(frame):

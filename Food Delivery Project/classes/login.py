@@ -4,8 +4,16 @@ from PIL import Image, ImageTk
 from classes.admin import Admin
 from classes.customer import Customer
 from classes.restaurant import Restaurant
-
+from classes.driver import Driver
 import mysql.connector
+
+# database connector
+sql_db = mysql.connector.connect(host='localhost',
+                                 port='3307',
+                                 user='root',
+                                 passwd='',
+                                 database='delivery_database')
+sql_cursor = sql_db.cursor()
 
 
 class Login(object):
@@ -89,15 +97,8 @@ class Login(object):
         Event that initiates when logging in the database
         """
         try:
-            # database connector
-            sql_db = mysql.connector.connect(host='localhost',
-                                             port='3307',
-                                             user='root',
-                                             passwd='',
-                                             database='delivery_database')
             uname = user_entry.get()
             pword = pwd_entry.get()
-            sql_cursor = sql_db.cursor()
             user_query = "SELECT Uname, Pword FROM users WHERE Uname = %s AND Pword = %s"
             sql_cursor.execute(user_query, [uname, pword])
             result = sql_cursor.fetchall()
@@ -116,7 +117,11 @@ class Login(object):
                     owner_id = sql_cursor.fetchone()
                     return Restaurant(self.root, owner_id[0])
                 elif permission[0] == "driver":
-                    pass
+                    driver_id_query = "SELECT driver.driverId FROM driver, users WHERE users.Uname = %s AND " \
+                                   "driver.dSsn = (SELECT Ssn FROM person WHERE person.P_uid = users.Uid)"
+                    sql_cursor.execute(driver_id_query, [uname])
+                    driver_id = sql_cursor.fetchone()
+                    return Driver(self.root, driver_id)
                 else:
                     cus_id_query = "SELECT customer.customerId FROM customer, users WHERE users.Uname = %s AND " \
                                    "customer.Cssn = (SELECT Ssn FROM person WHERE person.P_uid = users.Uid)"
