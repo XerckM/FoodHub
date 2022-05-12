@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from classes.admin import Admin
-from classes.user import User
+from classes.customer import Customer
 from classes.restaurant import Restaurant
 
 import mysql.connector
@@ -94,7 +94,7 @@ class Login(object):
                                              port='3307',
                                              user='root',
                                              passwd='',
-                                             database='food_delivery')
+                                             database='delivery_database')
             uname = user_entry.get()
             pword = pwd_entry.get()
             sql_cursor = sql_db.cursor()
@@ -104,15 +104,25 @@ class Login(object):
             if result:
                 messagebox.showinfo("", "Login Successful!")
                 frame.destroy()
-                permission_query = "SELECT U_priv FROM users WHERE Uname = %s AND Pword = %s"
+                permission_query = "SELECT Perm FROM users WHERE Uname = %s AND Pword = %s"
                 sql_cursor.execute(permission_query, [uname, pword])
                 permission = sql_cursor.fetchone()
                 if permission[0] == "admin":
                     return Admin(self.root)
                 elif permission[0] == "manage":
-                    return Restaurant(self.root)
+                    owner_id_query = f'SELECT restowner.ownerId from restowner, users where users.Uname = %s AND ' \
+                                     f'restowner.Ossn = (SELECT Ssn from person where person.P_uid = users.Uid);'
+                    sql_cursor.execute(owner_id_query, [uname])
+                    owner_id = sql_cursor.fetchone()
+                    return Restaurant(self.root, owner_id[0])
+                elif permission[0] == "driver":
+                    pass
                 else:
-                    return User(self.root)
+                    cus_id_query = "SELECT customer.customerId FROM customer, users WHERE users.Uname = %s AND " \
+                                   "customer.Cssn = (SELECT Ssn FROM person WHERE person.P_uid = users.Uid)"
+                    sql_cursor.execute(cus_id_query, [uname])
+                    cus_id = sql_cursor.fetchone()
+                    return Customer(self.root, cus_id)
             else:
                 messagebox.showinfo("Error!", "Incorrect username or password.")
         except mysql.connector.errors.InterfaceError:
