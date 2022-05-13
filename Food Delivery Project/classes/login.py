@@ -115,19 +115,22 @@ class Login(object):
                                      f'restowner.Ossn = (SELECT Ssn from person where person.P_uid = users.Uid);'
                     sql_cursor.execute(owner_id_query, [uname])
                     owner_id = sql_cursor.fetchone()
+                    print(owner_id[0])
                     return Restaurant(self.root, owner_id[0])
                 elif permission[0] == "driver":
                     driver_id_query = "SELECT driver.driverId FROM driver, users WHERE users.Uname = %s AND " \
                                    "driver.dSsn = (SELECT Ssn FROM person WHERE person.P_uid = users.Uid)"
                     sql_cursor.execute(driver_id_query, [uname])
                     driver_id = sql_cursor.fetchone()
-                    return Driver(self.root, driver_id)
+                    print(driver_id[0])
+                    return Driver(self.root, driver_id[0])
                 else:
                     cus_id_query = "SELECT customer.customerId FROM customer, users WHERE users.Uname = %s AND " \
                                    "customer.Cssn = (SELECT Ssn FROM person WHERE person.P_uid = users.Uid)"
                     sql_cursor.execute(cus_id_query, [uname])
                     cus_id = sql_cursor.fetchone()
-                    return Customer(self.root, cus_id)
+                    print(cus_id[0])
+                    return Customer(self.root, cus_id[0])
             else:
                 messagebox.showinfo("Error!", "Incorrect username or password.")
         except mysql.connector.errors.InterfaceError:
