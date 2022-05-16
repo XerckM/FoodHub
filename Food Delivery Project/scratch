@@ -1,0 +1,51 @@
+import mysql.connector
+from classes.database import Database
+mydb = mysql.connector.connect(host='localhost',
+                               user='root',
+                               passwd='Jollyrancher09!')
+mycursor = mydb.cursor()
+
+db = Database()
+
+remove = db.remove()
+
+mycursor.execute(remove)
+mycursor.execute('SHOW DATABASES')
+
+for datab in mycursor:
+    print(datab)
+
+
+
+        try:
+            db = mysql.connector.connect(host='localhost',
+                                         user=self.user,
+                                         passwd=self.pwd,
+                                         database='food_delivery')
+            if db:
+                messagebox.showinfo("", "Login Successful!")
+                self.root.destroy()
+        except BaseException:
+            messagebox.showinfo("", "Incorrect username or password.")
+
+
+        # Copyright label
+        cr = Label(frame, text='Copyright © 2022 FoodHub Inc.', bg='#FF8000', fg='white')
+        cr.place(relx=0.5, rely=0.94, anchor=CENTER)
+
+
+        rename_frame = Frame(frame)
+        rename_frame.config(width=850, height=550, bg="blue")
+        rename_frame.place(relx=1, rely=1, anchor=SE)
+
+        modify_frame = Frame(frame)
+        modify_frame.config(width=850, height=550, bg="yellow")
+        modify_frame.place(relx=1, rely=1, anchor=SE)
+
+        profile_frame = Frame(frame)
+        profile_frame.config(width=850, height=550)
+        profile_frame.place(relx=1, rely=1, anchor=SE)
+
+        edit_info_frame = Frame(frame)
+        edit_info_frame.config(width=850, height=550, bg="green")
+        edit_info_frame.place(relx=1, rely=1, anchor=SE)
