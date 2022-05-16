@@ -75,8 +75,8 @@ class Driver(object):
                                  yscrollcommand=tree_view_scroll.set)
         tree_view_scroll.config(command=view_orders_table.yview)
         view_orders_table.pack()
-        view_orders_table.column("1", width=100, anchor='c')
-        view_orders_table.column("2", width=100, anchor='c')
+        view_orders_table.column("1", width=80, anchor='c')
+        view_orders_table.column("2", width=80, anchor='c')
         view_orders_table.column("3", width=130, anchor='c')
         view_orders_table.column("4", width=130, anchor='c')
         view_orders_table.column("5", width=130, anchor='c')
@@ -88,13 +88,17 @@ class Driver(object):
         view_orders_table.heading("5", text="City")
         view_orders_table.heading("6", text="State")
 
-        view_orders_button = Button(pickup_frame, command='')
-        view_orders_button.config(text='Pickup', width=33)
-        view_orders_button.place(relx=0.355, rely=0.75)
-
         refresh_orders_button = Button(pickup_frame, command=self.refresh_button)
         refresh_orders_button.config(text='Refresh', width=33)
-        refresh_orders_button.place(relx=0.355, rely=0.8)
+        refresh_orders_button.place(relx=0.355, rely=0.75)
+
+        pickup_orders_button = Button(pickup_frame, command=self.pickup_orders)
+        pickup_orders_button.config(text='Pickup', width=33)
+        pickup_orders_button.place(relx=0.355, rely=0.8)
+
+        delivered_button = Button(pickup_frame, command=self.delivered_order)
+        delivered_button.config(text='Delivered', width=33)
+        delivered_button.place(relx=0.355, rely=0.85)
 
         # Buttons
 
@@ -115,6 +119,35 @@ class Driver(object):
         self.show_frame(pickup_frame)
 
         frame.protocol('WM_DELETE_WINDOW', self.on_clickx)
+
+    @staticmethod
+    def pickup_orders(event=None):
+        try:
+            item_list = None
+            for dt in view_orders_table.selection():
+                item_list = view_orders_table.item(dt, 'values')
+            order_id = item_list[0]
+            picked_up_query = "UPDATE orderstatus SET oStatus = 'On the way' WHERE orderstatus.orderId = %s"
+            sql_cursor.execute(picked_up_query, [order_id])
+            sql_db.commit()
+            messagebox.showinfo("", "Order updated!")
+        except BaseException:
+            messagebox.showinfo("", "Something went wrong!")
+
+    @staticmethod
+    def delivered_order(event=None):
+        try:
+            item_list = None
+            for dt in view_orders_table.selection():
+                item_list = view_orders_table.item(dt, 'values')
+            order_id = item_list[0]
+            picked_up_query = "UPDATE orderstatus SET oStatus = 'Delivered' WHERE orderstatus.orderId = %s"
+            sql_cursor.execute(picked_up_query, [order_id])
+            sql_db.commit()
+
+            messagebox.showinfo("", "Order updated!")
+        except BaseException:
+            messagebox.showinfo("", "Something went wrong!")
 
     @staticmethod
     def refresh_button(event=None):

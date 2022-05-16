@@ -329,7 +329,7 @@ class Restaurant(object):
         tree_order_scroll = Scrollbar(tree_order_frame)
         tree_order_scroll.pack(side=RIGHT, fill=Y)
 
-        view_cus_order_table = ttk.Treeview(tree_order_frame, selectmode='browse')
+        view_cus_order_table = ttk.Treeview(tree_order_frame, selectmode='extended')
         view_cus_order_table.config(columns=("1", "2", "3"), show='headings',
                                     yscrollcommand=tree_order_scroll.set)
         tree_order_scroll.config(command=view_cus_order_table.yview)
@@ -472,7 +472,7 @@ class Restaurant(object):
         view_cus_order_table.delete(*view_cus_order_table.get_children())
         tree_order_frame.update()
 
-        view_cus_order_query = "SELECT orders.orderId, person.fname, person.lname FROM orders, customer " \
+        view_cus_order_query = "SELECT orders.orderId, person.fname, person.lname FROM orders " \
                                "INNER JOIN person WHERE orders.customerId = (SELECT customer.customerId FROM " \
                                "customer WHERE customer.Cssn = person.Ssn)"
         sql_cursor.execute(view_cus_order_query)
