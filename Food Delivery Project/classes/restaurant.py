@@ -34,7 +34,7 @@ class Restaurant(object):
             mod_name_entry, mod_price_entry, mod_calories_entry, mod_frame_button, \
             res_name_box, res_city_box, res_phone_box, res_open_box, res_close_box, \
             res_owner_box, res_city_box, res_state_box, profile_frame, apply_profile_button, \
-            view_orders_table, tree_view_frame
+            view_orders_table, tree_view_frame, tree_order_frame, view_cus_order_table
 
         # top level frame and window icon
         frame = Toplevel(root)
@@ -323,8 +323,26 @@ class Restaurant(object):
 
         # view orders frame
 
+        tree_order_frame = Frame(view_orders_frame)
+        tree_order_frame.place(relx=0.25, rely=0.5, anchor=CENTER)
+
+        tree_order_scroll = Scrollbar(tree_order_frame)
+        tree_order_scroll.pack(side=RIGHT, fill=Y)
+
+        view_cus_order_table = ttk.Treeview(tree_order_frame, selectmode='browse')
+        view_cus_order_table.config(columns=("1", "2", "3"), show='headings',
+                                    yscrollcommand=tree_order_scroll.set)
+        tree_order_scroll.config(command=view_cus_order_table.yview)
+        view_cus_order_table.pack()
+        view_cus_order_table.column("1", width=80, anchor='c')
+        view_cus_order_table.column("2", width=80, anchor='c')
+        view_cus_order_table.column("3", width=80, anchor='c')
+        view_cus_order_table.heading("1", text="Order Id")
+        view_cus_order_table.heading("2", text="First Name")
+        view_cus_order_table.heading("3", text="Last Name")
+
         tree_view_frame = Frame(view_orders_frame)
-        tree_view_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+        tree_view_frame.place(relx=0.7, rely=0.5, anchor=CENTER)
 
         tree_view_scroll = Scrollbar(tree_view_frame)
         tree_view_scroll.pack(side=RIGHT, fill=Y)
@@ -343,13 +361,17 @@ class Restaurant(object):
         view_orders_table.heading("3", text="Food Name")
         view_orders_table.heading("4", text="Order Id")
 
-        view_orders_button = Button(view_orders_frame, command=self.order_ready_button)
-        view_orders_button.config(text='Order Ready for Pickup', width=33)
-        view_orders_button.place(relx=0.355, rely=0.75)
+        view_orders_button = Button(view_orders_frame, command=self.view_order_items_button)
+        view_orders_button.config(text='View Order Items', width=33)
+        view_orders_button.place(relx=0.1, rely=0.75)
+
+        view_order_items_button = Button(view_orders_frame, command=self.order_ready_button)
+        view_order_items_button.config(text='Order Ready for Pickup', width=33)
+        view_order_items_button.place(relx=0.55, rely=0.75)
 
         refresh_orders_button = Button(view_orders_frame, command=self.refresh_button)
         refresh_orders_button.config(text='Refresh', width=33)
-        refresh_orders_button.place(relx=0.355, rely=0.8)
+        refresh_orders_button.place(relx=0.1, rely=0.8)
 
         # Left Side Buttons
 
@@ -431,20 +453,49 @@ class Restaurant(object):
 
     @staticmethod
     def order_ready_button(event=None):
-        get_selection = view_orders_table.selection()
-        size_of_selection = len(get_selection)
-        for item in range(size_of_selection):
-            pass
+        item_list = None
+        for dt in view_cus_order_table.selection():
+            item_list = view_cus_order_table.item(dt, 'values')
+        select_order_id = item_list[0]
+
+        ready_for_order_query = "UPDATE `orderstatus` SET orderstatus.orderId = %s, " \
+                                "ETA = (CURTIME() + INTERVAL 45 MINUTE), oStatus = 'Ready'"
+        sql_cursor.execute(ready_for_order_query, [select_order_id])
+        sql_db.commit()
+
+        view_orders_table.delete(*view_orders_table.get_children())
+        tree_view_frame.update()
+
 
     @staticmethod
     def refresh_button(event=None):
+        view_cus_order_table.delete(*view_cus_order_table.get_children())
+        tree_order_frame.update()
+
+        view_cus_order_query = "SELECT orders.orderId, person.fname, person.lname FROM orders, customer " \
+                               "INNER JOIN person WHERE orders.customerId = (SELECT customer.customerId FROM " \
+                               "customer WHERE customer.Cssn = person.Ssn)"
+        sql_cursor.execute(view_cus_order_query)
+        table_items = sql_cursor.fetchall()
+
+        for dt in table_items:
+            view_cus_order_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2]))
+
+    @staticmethod
+    def view_order_items_button(event=None):
+        item_list = None
+        for dt in view_cus_order_table.selection():
+            item_list = view_cus_order_table.item(dt, 'values')
+        select_order_id = item_list[0]
+        print(select_order_id)
+
         view_orders_table.delete(*view_orders_table.get_children())
         tree_view_frame.update()
 
         view_order_query = "SELECT inOrder_id, inorder.menuId, foodName, inorder.orderId FROM inorder, orders " \
                            "INNER JOIN food WHERE inorder.foodId = food.foodId " \
-                           "AND orders.orderId = inorder.orderId"
-        sql_cursor.execute(view_order_query)
+                           "AND orders.orderId = %s"
+        sql_cursor.execute(view_order_query, [select_order_id])
         table_items = sql_cursor.fetchall()
 
         for dt in table_items:

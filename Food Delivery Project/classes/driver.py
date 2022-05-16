@@ -49,18 +49,17 @@ class Driver(object):
         render = ImageTk.PhotoImage(load)
         logo = Label(frame, image=render, relief='flat', bg='white')
         logo.image = render
-        logo.place(anchor=CENTER)
-        logo.grid(row=0, column=0, columnspan=2)
+        logo.place(relx=0.5, rely=0.08, anchor=CENTER)
 
         # Output frames
         pickup_frame = Frame(frame)
         pickup_frame.config(width=850, height=565)
+        pickup_frame.place(relx=0.51, rely=0.55, anchor=CENTER)
         pickup_frame.grid_propagate(False)
-        pickup_frame.grid(row=1, column=1, rowspan=5)
 
-        profile_frame = Frame(frame)
+        profile_frame = Frame('')
         profile_frame.config(width=850, height=565)
-        profile_frame.grid(row=1, column=1, rowspan=5)
+        profile_frame.place(relx=0.61, rely=0.55, anchor=CENTER)
         profile_frame.grid_propagate(False)
 
         # pickup frame activities
@@ -72,7 +71,7 @@ class Driver(object):
         tree_view_scroll.pack(side=RIGHT, fill=Y)
 
         view_orders_table = ttk.Treeview(tree_view_frame, selectmode='extended')
-        view_orders_table.config(columns=("1", "2", "3", "4"), show='headings',
+        view_orders_table.config(columns=("1", "2", "3", "4", "5", "6"), show='headings',
                                  yscrollcommand=tree_view_scroll.set)
         tree_view_scroll.config(command=view_orders_table.yview)
         view_orders_table.pack()
@@ -80,10 +79,14 @@ class Driver(object):
         view_orders_table.column("2", width=100, anchor='c')
         view_orders_table.column("3", width=130, anchor='c')
         view_orders_table.column("4", width=130, anchor='c')
+        view_orders_table.column("5", width=130, anchor='c')
+        view_orders_table.column("6", width=130, anchor='c')
         view_orders_table.heading("1", text="Order Id")
-        view_orders_table.heading("2", text="Customer Id")
-        view_orders_table.heading("3", text="Customer First Name")
-        view_orders_table.heading("4", text="Customer Last Name")
+        view_orders_table.heading("2", text="First Name")
+        view_orders_table.heading("3", text="Last Name")
+        view_orders_table.heading("4", text="Street")
+        view_orders_table.heading("5", text="City")
+        view_orders_table.heading("6", text="State")
 
         view_orders_button = Button(pickup_frame, command='')
         view_orders_button.config(text='Pickup', width=33)
@@ -95,19 +98,19 @@ class Driver(object):
 
         # Buttons
 
-        pickup_button = Button(frame, command=lambda: self.show_frame(pickup_frame))
+        pickup_button = Button('', command=lambda: self.show_frame(pickup_frame))
         pickup_button.config(text='Pickup Order', width=33, height=7, relief='flat', bg='#ff5900',
                             activebackground='#c75610', fg='white')
         pickup_button.bind('<Enter>', lambda event: self.button_on_hover(pickup_button, event))
         pickup_button.bind('<Leave>', lambda event: self.button_off_hover(pickup_button, event))
-        pickup_button.grid(row=1, column=0)
+        pickup_button.place(relx=0, rely=0.159)
 
-        profile_button = Button(frame, command=lambda: self.show_frame(profile_frame))
+        profile_button = Button('', command=lambda: self.show_frame(profile_frame))
         profile_button.config(text='Edit Profile', width=33, height=7, relief='flat', bg='#ff5900',
                               activebackground='#c75610', fg='white')
         profile_button.bind('<Enter>', lambda event: self.button_on_hover(profile_button, event))
         profile_button.bind('<Leave>', lambda event: self.button_off_hover(profile_button, event))
-        profile_button.grid(row=3, column=0)
+        profile_button.place(relx=0, rely=0.32)
 
         self.show_frame(pickup_frame)
 
@@ -118,14 +121,14 @@ class Driver(object):
         view_orders_table.delete(*view_orders_table.get_children())
         tree_view_frame.update()
 
-        view_order_query = "SELECT orders.orderId, orders.customerId, person.fname, person.lname FROM orders " \
-                           "INNER JOIN person INNER JOIN customer WHERE orders.customerId = customer.customerId " \
-                           "AND customer.Cssn = person.Ssn"
+        view_order_query = "SELECT orders.orderId, person.fname, person.lname, customer.Street, customer.City, " \
+                           "customer.state FROM orders INNER JOIN person INNER JOIN customer WHERE orders.customerId " \
+                           "= customer.customerId AND customer.Cssn = person.Ssn"
         sql_cursor.execute(view_order_query)
         table_items = sql_cursor.fetchall()
 
         for dt in table_items:
-            view_orders_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2], dt[3]))
+            view_orders_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2], dt[3], dt[4], dt[5]))
 
     def on_clickx(self, event=None):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):

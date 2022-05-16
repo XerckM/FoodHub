@@ -24,7 +24,8 @@ class Customer(object):
     def customer_frame(self, root):
         global view_table, tree_order_frame, restaurant_menu, view_table, \
             tree_view_order_frame, view_order_table, pay_frame, total_entry, pay_name_entry, \
-            credit_card_entry, exp_date_entry, sec_code_entry, order_frame
+            credit_card_entry, exp_date_entry, sec_code_entry, order_frame, view_order_status_frame, \
+            tree_view_order_status_frame, view_order_status_table
 
         # top level frame and window icon
         frame = Toplevel(root)
@@ -50,36 +51,28 @@ class Customer(object):
         render = ImageTk.PhotoImage(load)
         logo = Label(frame, image=render, relief='flat', bg='white')
         logo.image = render
-        logo.place(anchor=CENTER)
-        logo.grid(row=0, column=0, columnspan=2)
+        logo.place(relx=0.5, rely=0.08, anchor=CENTER)
 
         # Output frames
         order_frame = Frame(frame)
         order_frame.config(width=850, height=565)
-        order_frame.grid_propagate(False)
-        order_frame.grid(row=1, column=1, rowspan=5)
+        order_frame.place(relx=0.61, rely=0.55, anchor=CENTER)
         order_frame.grid_propagate(False)
 
         view_order_status_frame = Frame(frame)
         view_order_status_frame.config(width=850, height=565)
-        view_order_status_frame.grid_propagate(False)
-        view_order_status_frame.grid(row=1, column=1, rowspan=5)
+        view_order_status_frame.place(relx=0.61, rely=0.55, anchor=CENTER)
         view_order_status_frame.grid_propagate(False)
 
-        profile_frame = Frame(frame)
+        profile_frame = Frame('')
         profile_frame.config(width=850, height=565)
-        profile_frame.grid(row=1, column=1, rowspan=5)
+        profile_frame.place(relx=0.61, rely=0.55, anchor=CENTER)
         profile_frame.grid_propagate(False)
 
         pay_frame = Frame(frame)
         pay_frame.config(width=850, height=565)
-        pay_frame.grid(row=1, column=1, rowspan=5)
+        pay_frame.place(relx=0.61, rely=0.55, anchor=CENTER)
         pay_frame.grid_propagate(False)
-
-        view_orders_frame = Frame(frame)
-        view_orders_frame.config(width=850, height=565)
-        view_orders_frame.grid(row=1, column=1, rowspan=5)
-        view_orders_frame.grid_propagate(False)
 
         # order food activities
 
@@ -192,10 +185,33 @@ class Customer(object):
         sec_code_entry.config(width=30)
         sec_code_entry.place(relx=0.6, rely=0.55, anchor=CENTER)
 
-        confirm_pay_button = Button(pay_frame, command='')
+        confirm_pay_button = Button(pay_frame, command=self.confirm_pay_button)
         confirm_pay_button.config(text="Confirm and Pay", width=33)
         confirm_pay_button.place(relx=0.4, rely=0.6)
 
+        # View order status frame
+
+        tree_view_order_status_frame = Frame(view_order_status_frame)
+        tree_view_order_status_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        tree_view_scroll = Scrollbar(tree_view_order_status_frame)
+        tree_view_scroll.pack(side=RIGHT, fill=Y)
+
+        view_order_status_table = ttk.Treeview(tree_view_order_status_frame, selectmode='browse')
+        view_order_status_table.config(columns=("1", "2", "3"), show='headings',
+                                       yscrollcommand=tree_view_scroll.set)
+        tree_view_scroll.config(command=view_table.yview)
+        view_order_status_table.pack()
+        view_order_status_table.column("1", width=100, anchor='c')
+        view_order_status_table.column("2", width=100, anchor='c')
+        view_order_status_table.column("3", width=100, anchor='c')
+        view_order_status_table.heading("1", text="Order Id")
+        view_order_status_table.heading("2", text="ETA")
+        view_order_status_table.heading("3", text="Order Status")
+
+        refresh_order_button = Button(view_order_status_frame, command=self.refresh_order_button)
+        refresh_order_button.config(text='Refresh', width=20)
+        refresh_order_button.place(relx=0.49, rely=0.8, anchor=CENTER)
 
         # Buttons
 
@@ -204,21 +220,21 @@ class Customer(object):
                             activebackground='#c75610', fg='white')
         order_button.bind('<Enter>', lambda event: self.button_on_hover(order_button, event))
         order_button.bind('<Leave>', lambda event: self.button_off_hover(order_button, event))
-        order_button.grid(row=1, column=0)
+        order_button.place(relx=0, rely=0.159)
 
         view_order_status_button = Button(frame, command=lambda: self.show_frame(view_order_status_frame))
         view_order_status_button.config(text='View Order Status', width=33, height=7, relief='flat', bg='#FF8000',
                                         activebackground='#c75610', fg='white')
         view_order_status_button.bind('<Enter>', lambda event: self.button_on_hover(view_order_status_button, event))
         view_order_status_button.bind('<Leave>', lambda event: self.button_off_hover(view_order_status_button, event))
-        view_order_status_button.grid(row=2, column=0)
+        view_order_status_button.place(relx=0, rely=0.32)
 
-        profile_button = Button(frame, command=lambda: self.show_frame(profile_frame))
+        profile_button = Button('', command=lambda: self.show_frame(profile_frame))
         profile_button.config(text='Edit Profile', width=33, height=7, relief='flat', bg='#ff5900',
                               activebackground='#c75610', fg='white')
         profile_button.bind('<Enter>', lambda event: self.button_on_hover(profile_button, event))
         profile_button.bind('<Leave>', lambda event: self.button_off_hover(profile_button, event))
-        profile_button.grid(row=3, column=0)
+        profile_button.place(relx=0, rely=0.48)
 
         self.show_frame(order_frame)
 
@@ -227,6 +243,20 @@ class Customer(object):
     def on_clickx(self, event=None):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
             self.root.destroy()
+
+    def refresh_order_button(self, event=None):
+        view_order_status_table.delete(*view_order_status_table.get_children())
+        tree_view_order_status_frame.update()
+
+        customer_id = self.id
+        order_status_query = "SELECT orderstatus.orderId, ETA, oStatus FROM " \
+                             "orderstatus, orders WHERE orders.orderId = (SELECT orders.orderId " \
+                             "FROM orders WHERE orders.customerId = %s)"
+        sql_cursor.execute(order_status_query, [customer_id])
+        table_items = sql_cursor.fetchall()
+
+        for dt in table_items:
+            view_order_status_table.insert(parent='', index='end', values=(dt[0], dt[1], dt[2]))
 
     @staticmethod
     def delete_button(event=None):
@@ -296,33 +326,53 @@ class Customer(object):
 
     @staticmethod
     def pay_button(event=None):
-        total_query = "SELECT SUM(price) Total FROM food as f INNER JOIN inorder as io WHERE f.foodId = io.foodId"
+        total_query = "SELECT ROUND(SUM(price), 2) Total FROM food as f INNER JOIN inorder as " \
+                      "io WHERE f.foodId = io.foodId"
         sql_cursor.execute(total_query)
         total = sql_cursor.fetchall()
         total_entry.insert(0, total[0])
         pay_frame.tkraise()
 
     def confirm_pay_button(self, event=None):
-        if pay_name_entry.get() != "" and credit_card_entry.get() != "" and exp_date_entry.get() == "" and \
-                sec_code_entry.get() != "":
+        try:
             customer_id = self.id
             payment_query = "INSERT INTO payment (paymentType, payAccepted, orderId)" \
-                            "VALUES ('Visa', 'Yes', (SELECT order.orderId FROM order WHERE customerId = %s))"
+                            "VALUES ('Visa', 'Yes', (SELECT orders.orderId FROM orders WHERE orders.customerId = %s))"
             sql_cursor.execute(payment_query, [customer_id])
             sql_db.commit()
+
             total_entry.delete(0, END)
             pay_name_entry.delete(0, END)
             credit_card_entry.delete(0, END)
             exp_date_entry.delete(0, END)
             sec_code_entry.delete(0, END)
+
+            order_status_query = "INSERT INTO orderstatus (orderId, oStatus) VALUES ((SELECT orders.orderId FROM " \
+                                 "orders WHERE orders.customerId = %s), 'Processing')"
+            sql_cursor.execute(order_status_query, [customer_id])
+            sql_db.commit()
+
             messagebox.showinfo("", "Payment Successful!")
             order_frame.tkraise()
-        else:
+        except BaseException as e:
             messagebox.showinfo("", "Payment Failed!")
 
-    @staticmethod
-    def show_frame(frame):
-        frame.tkraise()
+    def show_frame(self, frame):
+        if frame == view_order_status_frame:
+            customer_id = self.id
+            order_status_query = "SELECT orderstatus.orderId, ETA, oStatus FROM orderstatus, orders WHERE " \
+                                 "orderstatus.orderId = (SELECT orders.orderId WHERE orders.customerId = %s)"
+
+            sql_cursor.execute(order_status_query, [customer_id])
+            result = sql_cursor.fetchall()
+            print(result)
+
+            view_order_status_table.delete(*view_order_status_table.get_children())
+            view_order_status_frame.update()
+
+            frame.tkraise()
+        else:
+            frame.tkraise()
 
     @staticmethod
     def button_on_hover(button, event=None):
