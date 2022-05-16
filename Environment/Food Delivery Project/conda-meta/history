@@ -1,0 +1,58 @@
+==> 2022-04-15 13:16:22 <==
+# cmd: C:\Users\merca\anaconda3\Scripts\conda-script.py create -p C:\Users\merca\anaconda3\envs\Food Delivery Project -y python=3.7
+# conda version: 4.10.3
++defaults/noarch::wheel-0.37.1-pyhd3eb1b0_0
++defaults/win-64::ca-certificates-2022.3.29-haa95532_0
++defaults/win-64::certifi-2021.10.8-py37haa95532_2
++defaults/win-64::openssl-1.1.1n-h2bbff1b_0
++defaults/win-64::pip-21.2.4-py37haa95532_0
++defaults/win-64::python-3.7.13-h6244533_0
++defaults/win-64::setuptools-61.2.0-py37haa95532_0
++defaults/win-64::sqlite-3.38.2-h2bbff1b_0
++defaults/win-64::vc-14.2-h21ff451_1
++defaults/win-64::vs2015_runtime-14.27.29016-h5e58377_2
++defaults/win-64::wincertstore-0.2-py37haa95532_2
+# update specs: ['python=3.7']
+==> 2022-04-15 19:00:03 <==
+# cmd: C:\Users\merca\anaconda3\Scripts\conda-script.py install -p C:/Users/merca/anaconda3/envs/Food Delivery Project mysql-connector-python -y
+# conda version: 4.10.3
++defaults/noarch::six-1.16.0-pyhd3eb1b0_1
++defaults/win-64::libprotobuf-3.6.0-h1a1b453_0
++defaults/win-64::mysql-connector-c-6.1.11-h33f27b4_1
++defaults/win-64::mysql-connector-python-8.0.18-py37h13ed8b8_1
++defaults/win-64::protobuf-3.6.0-py37he025d50_0
++defaults/win-64::zlib-1.2.11-hbd8134f_5
+# update specs: ['mysql-connector-python']
+==> 2022-04-16 00:47:38 <==
+# cmd: C:\Users\merca\anaconda3\Scripts\conda-script.py install -p C:/Users/merca/anaconda3/envs/Food Delivery Project pillow -y
+# conda version: 4.10.3
++defaults/win-64::freetype-2.10.4-hd328e21_0
++defaults/win-64::jpeg-9d-h2bbff1b_0
++defaults/win-64::libpng-1.6.37-h2a8f88b_0
++defaults/win-64::libtiff-4.2.0-hd0e1b90_0
++defaults/win-64::libwebp-1.2.2-h2bbff1b_0
++defaults/win-64::lz4-c-1.9.3-h2bbff1b_1
++defaults/win-64::pillow-9.0.1-py37hdc2b20a_0
++defaults/win-64::tk-8.6.11-h2bbff1b_0
++defaults/win-64::xz-5.2.5-h62dcd97_0
++defaults/win-64::zstd-1.4.9-h19a0ad4_0
+# update specs: ['pillow']
+==> 2022-05-12 10:21:55 <==
+# cmd: C:\Users\merca\anaconda3\Scripts\conda-script.py install -p C:/Users/merca/anaconda3/envs/Food Delivery Project pyinstaller -y
+# conda version: 4.10.3
+-defaults/win-64::ca-certificates-2022.3.29-haa95532_0
+-defaults/win-64::openssl-1.1.1n-h2bbff1b_0
++defaults/noarch::altgraph-0.17-pyhd3eb1b0_0
++defaults/noarch::macholib-1.14-pyhd3eb1b0_1
++defaults/noarch::pefile-2019.4.18-py_0
++defaults/noarch::typing_extensions-4.1.1-pyh06a4308_0
++defaults/win-64::ca-certificates-2022.4.26-haa95532_0
++defaults/win-64::future-0.18.2-py37_1
++defaults/win-64::importlib-metadata-4.11.3-py37haa95532_0
++defaults/win-64::openssl-1.1.1o-h2bbff1b_0
++defaults/win-64::pycryptodome-3.12.0-py37h2bbff1b_0
++defaults/win-64::pyinstaller-4.8-py37h8cc25b3_0
++defaults/win-64::pywin32-302-py37h2bbff1b_2
++defaults/win-64::pywin32-ctypes-0.2.0-py37_1001
++defaults/win-64::zipp-3.8.0-py37haa95532_0
+# update specs: ['pyinstaller']
