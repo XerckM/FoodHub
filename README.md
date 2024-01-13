@@ -1,6 +1,6 @@
-# MySQL Database Python Project
+# FoodHub
 
-Welcome to the MySQL Database Python Project, a Python-based application designed to interact with a MySQL database for a food delivery service. This project demonstrates the integration of a MySQL database with a Python application using Tkinter for the graphical user interface.
+Welcome to the FoodHub, a Python-based application designed to interact with a MySQL database for a food delivery service. This project demonstrates the integration of a MySQL database with a Python application using Tkinter for the graphical user interface.
 
 ## Features
 
